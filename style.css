@@ -1,0 +1,25 @@
+span{
+/*    border: solid 1px black;*/
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    color: #F3D1B6;
+    border-radius: 19px;
+    z-index: 99;
+    position: relative;
+    font-size: 1em;
+    text-align: center;
+    color:transparent;
+}
+
+.noir{
+    background: #000;
+}
+.blanc{
+    background: #fff;
+}
+
+img{
+    position: fixed;
+    z-index: 0;
+}
