@@ -8,16 +8,14 @@ var goGame = {
 
 for(x=0;x<goGame.table.length;x++){
     for(y=0;y<goGame.table[x].length;y++){
-        document.write('<span class="case" id='+ x +' onClick="clicked(id,this);">' + y + '</span>');
+        document.write('<span class="case" id='+ x +' data-info=' + y + ' onClick="clicked(id,this);">.</span>');
     }
     document.write('<br>');
 }
 
 function clicked(e,u){
     var tableX = e,
-        tableY = parseInt($(u).text());
-    
-    console.log(u);
+        tableY = parseInt($(u).attr('data-info'));
 
     goGame.turn = goGame.turn + 1;
 
@@ -25,7 +23,7 @@ function clicked(e,u){
 
         function checkPair(nombre){
             res = nombre%2;
-            
+
             if(res === 1){
                 return true;
             }
@@ -41,7 +39,8 @@ function clicked(e,u){
         else{
 
             goGame.table[tableX][tableY] = 2;
-             $(u).addClass('noir');
+            $(u).addClass('noir');
+
         }
 
     }
@@ -49,5 +48,63 @@ function clicked(e,u){
         alert('case déjà joué');
         goGame.turn = goGame.turn - 1;
     }
+
+    eliminate();
+
 }
+
+function eliminate(){
+
+    for(x=0;x<goGame.table.length;x++){
+        for(y=0;y<goGame.table[0].length;y++){
+            
+            if(goGame.table[x][y] == 1)
+            {
+
+                if(goGame.table[x-1][y] == 2 && goGame.table[x+1][y] == 2 && goGame.table[x][y-1] == 2 && goGame.table[x][y+1] == 2)
+                {
+                    goGame.table[x][y] = 3;
+                }
+
+            }
+
+        }
+        
+    }
+
+}
+
+function retireCouleur(){
+    
+    
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
