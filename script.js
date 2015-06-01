@@ -19,27 +19,49 @@ function clicked(e,u){
 
     goGame.turn = goGame.turn + 1;
 
-    if(goGame.table[tableX][tableY] === 0 ){
+    function checkPair(nombre){
+        res = nombre%2;
 
-        function checkPair(nombre){
-            res = nombre%2;
-
-            if(res === 1){
-                return true;
-            }
-            else return false;
+        if(res === 1){
+            return true;
         }
+        else return false;
+    }
+
+    $('.passeTour').on('click', function(){
+        
+        var passeBlanc = 0,
+            passeNoir  = 0;
+        
+        if(checkPair(goGame.turn) == false)
+        {
+            
+            passeBlanc = passeBlanc + 1;
+            
+        }
+        else
+        {
+            
+            passeNoir = passeNoir + 1;
+            
+        }
+
+    });
+
+    if(goGame.table[tableX][tableY] === 0 ){
 
         if(checkPair(goGame.turn) == false){
 
             goGame.table[tableX][tableY] = 1;
             $(u).addClass('blanc');
+            $('.tour').text('Noir');
 
         }
         else{
 
             goGame.table[tableX][tableY] = 2;
             $(u).addClass('noir');
+            $('.tour').text('Blanc');
 
         }
 
@@ -51,6 +73,7 @@ function clicked(e,u){
 
     eliminate();
     retireCouleur();
+    current_state();
 }
 
 function eliminate(){
@@ -102,14 +125,50 @@ function retireCouleur(){
                 $(mort).removeClass('noir');
 
             }
-
         }
     }
-
 }
 
 
+function current_state(){
 
+    var compteNoir      = 0,
+        compteBlanc     = 0,
+        prisonnierNoir  = 0,
+        prisonnierBlanc = 0,
+        afficheBlanc    = $('.valueBlanc'),
+        afficheNoir     = $('.valueNoir'),
+        affichePBlanc   = $('.prisonnierBlanc'),
+        affichePNoir    = $('.prisonnierNoir');
+
+    for(x=0;x<goGame.table.length;x++){
+        for(y=0;y<goGame.table[0].length;y++){
+
+            if(goGame.table[x][y] == 1)
+            {
+                compteNoir = compteNoir + 1;
+            }  
+            if(goGame.table[x][y] == 2)
+            {
+                compteBlanc = compteBlanc + 1;
+            }  
+            if(goGame.table[x][y] == 3)
+            {
+                prisonnierNoir = prisonnierNoir + 1;
+            }  
+            if(goGame.table[x][y] == 4)
+            {
+                prisonnierBlanc = prisonnierBlanc + 1;
+            }
+        }
+
+        $(afficheNoir).text(compteNoir);
+        $(afficheBlanc).text(compteBlanc);
+        $(affichePBlanc).text(prisonnierNoir);
+        $(affichePNoir).text(prisonnierBlanc);
+
+    }
+}
 
 
 
