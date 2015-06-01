@@ -1,26 +1,39 @@
 
 var goGame = {
 
-    table : [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+    table : [],
     turn  : 0
+}
 
+var chainCpt = 1;
+
+for(x=0;x<=18;x++){
+    goGame.table[x] =[];
+    for(y=0;y<=18;y++){
+        goGame.table[x][y] = {
+            xPiece : x,
+            yPiece : y,
+            color : null,
+            chain : 0
+        }
+    }
 }
 
 for(x=0;x<goGame.table.length;x++){
     for(y=0;y<goGame.table[x].length;y++){
-        document.write('<span class="case" id='+ x +' data-info=' + y + ' onClick="clicked(id,this);">.</span>');
+        document.write('<span class="case" onClick="clicked('+ x +','+ y +');">.</span>');
     }
     document.write('<br>');
 }
 
-function clicked(e,u){
-    var tableX = e,
-        tableY = parseInt($(u).attr('data-info'));
+function clicked(x,y){
 
-    goGame.turn = goGame.turn + 1;
-
+<<<<<<< Updated upstream
     function checkPair(nombre){
         res = nombre%2;
+=======
+    if(goGame.table[x][y].color == null){
+>>>>>>> Stashed changes
 
         if(res === 1){
             return true;
@@ -52,57 +65,72 @@ function clicked(e,u){
 
         if(checkPair(goGame.turn) == false){
 
-            goGame.table[tableX][tableY] = 1;
+            goGame.table[x][y] = {
+                color : 'blanc',
+                chain : chainCpt
+            };
+            chainCpt++;
             $(u).addClass('blanc');
             $('.tour').text('Noir');
 
         }
         else{
 
-            goGame.table[tableX][tableY] = 2;
+            goGame.table[x][y] = {
+                color : 'noir',
+                chain : chainCpt
+            };
+            chainCpt++;
             $(u).addClass('noir');
             $('.tour').text('Blanc');
 
         }
-
+    goGame.turn = goGame.turn + 1;
     }
     else{
-        alert('case déjà joué');
-        goGame.turn = goGame.turn - 1;
-    }
-
-    eliminate();
+        console.log('case déjà joué');
+    }    
     retireCouleur();
     current_state();
 }
 
-function eliminate(){
+function testChain(x,y){
 
-    for(x=0;x<goGame.table.length;x++){
-        for(y=0;y<goGame.table[0].length;y++){
-
-            if(goGame.table[x][y] == 1)
-            {
-
-                if(goGame.table[x-1][y] == 2 && goGame.table[x+1][y] == 2 && goGame.table[x][y-1] == 2 && goGame.table[x][y+1] == 2)
-                {
-                    goGame.table[x][y] = 3;
-                }
-
+    for (var i = -1; i <= 1; i+2) {
+        for (var j = -1; j <= 1; j+2) {
+            if(goGame.table[x-1][y].color != null && goGame.table[x+1][y].color != null && goGame.table[x][y-1].color != null && goGame.table[x][y+1].color != null){
+                //tester les chaines
             }
-            if(goGame.table[x][y] == 2)
-            {
-
-                if(goGame.table[x-1][y] == 1 && goGame.table[x+1][y] == 1 && goGame.table[x][y-1] == 1 && goGame.table[x][y+1] == 1)
-                {
-                    goGame.table[x][y] = 4;
-                }
-
-            }
-
         }
-
     }
+    
+
+
+    // for(x=0;x<goGame.table.length;x++){
+    //     for(y=0;y<goGame.table[0].length;y++){
+
+    //         if(goGame.table[x][y] == 1)
+    //         {
+
+    //             if(goGame.table[x-1][y] == 2 && goGame.table[x+1][y] == 2 && goGame.table[x][y-1] == 2 && goGame.table[x][y+1] == 2)
+    //             {
+    //                 goGame.table[x][y] = 3;
+    //             }
+
+    //         }
+    //         if(goGame.table[x][y] == 2)
+    //         {
+
+    //             if(goGame.table[x-1][y] == 1 && goGame.table[x+1][y] == 1 && goGame.table[x][y-1] == 1 && goGame.table[x][y+1] == 1)
+    //             {
+    //                 goGame.table[x][y] = 4;
+    //             }
+
+    //         }
+
+    //     }
+
+    // }
 
 }
 
