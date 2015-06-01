@@ -91,14 +91,14 @@ function retireCouleur(){
             if(goGame.table[x][y] == 3)
             {
 
-                var mort = $('span#'+x+'.case[data-info='+y+']'),
+                var mort = $('span#'+x+'.case[data-info='+y+']');
                 $(mort).removeClass('blanc');
 
             }
             if(goGame.table[x][y] == 4)
             {
 
-                var mort = $('span#'+x+'.case[data-info='+y+']'),
+                var mort = $('span#'+x+'.case[data-info='+y+']');
                 $(mort).removeClass('noir');
 
             }
