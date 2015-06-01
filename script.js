@@ -50,14 +50,14 @@ function clicked(e,u){
     }
 
     eliminate();
-
+    retireCouleur();
 }
 
 function eliminate(){
 
     for(x=0;x<goGame.table.length;x++){
         for(y=0;y<goGame.table[0].length;y++){
-            
+
             if(goGame.table[x][y] == 1)
             {
 
@@ -67,17 +67,45 @@ function eliminate(){
                 }
 
             }
+            if(goGame.table[x][y] == 2)
+            {
+
+                if(goGame.table[x-1][y] == 1 && goGame.table[x+1][y] == 1 && goGame.table[x][y-1] == 1 && goGame.table[x][y+1] == 1)
+                {
+                    goGame.table[x][y] = 4;
+                }
+
+            }
 
         }
-        
+
     }
 
 }
 
 function retireCouleur(){
-    
-    
-    
+
+    for(x=0;x<goGame.table.length;x++){
+        for(y=0;y<goGame.table[0].length;y++){
+
+            if(goGame.table[x][y] == 3)
+            {
+
+                var mort = $('span#'+x+'.case[data-info='+y+']'),
+                $(mort).removeClass('blanc');
+
+            }
+            if(goGame.table[x][y] == 4)
+            {
+
+                var mort = $('span#'+x+'.case[data-info='+y+']'),
+                $(mort).removeClass('noir');
+
+            }
+
+        }
+    }
+
 }
 
 
