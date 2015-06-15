@@ -39,23 +39,23 @@ function clicked(x,y){
             if(checkPair(goGame.turn) == false){
 
                 goGame.table[x][y] = {
-                    color : 'blanc',
-                    chain : chainCpt
-                };
-                chainCpt++;
-                $('#x'+x+'y'+y).addClass('blanc');
-                $('.tour').text('Noir');
-
-            }
-            else{
-
-                goGame.table[x][y] = {
                     color : 'noir',
                     chain : chainCpt
                 };
                 chainCpt++;
                 $('#x'+x+'y'+y).addClass('noir');
                 $('.tour').text('Blanc');
+
+            }
+            else{
+
+                goGame.table[x][y] = {
+                    color : 'blanc',
+                    chain : chainCpt
+                };
+                chainCpt++;
+                $('#x'+x+'y'+y).addClass('blanc');
+                $('.tour').text('Noir');
 
             }
             goGame.turn = goGame.turn + 1;
@@ -184,14 +184,12 @@ function checkPair(nombre){
 }
 
 
-// Fonction qui determine la fin de partie (pas finit)
+// Fonction qui determine la fin de partie
 var comptePasse = 0;
-$('.passeTour').on('click', function(){
+function passetour(){
 
     comptePasse = comptePasse + 1;
     goGame.turn = goGame.turn + 1;
-    var precTurn = $('.compteurPasse').val();
-
 
     if(comptePasse == 1)
     {
@@ -199,27 +197,69 @@ $('.passeTour').on('click', function(){
     }
     else if(comptePasse == 2)
     {
+        var precTurn = $('.compteurPasse').val();
         if(precTurn == (goGame.turn-1))
         {
-            alert('finit');
+            endGame();
         }
-        else{
-            comptePasse = 1;
-        }
+
     }
     else
     {
-        comptePasse = 0;
+        comptePasse = 1;
+        $('.compteurPasse').val(''+goGame.turn+'');
     }
 
-    console.log('compteur passe : '+comptePasse);
-    console.log('compteur tour précedent : '+precTurn);
-    console.log('tour : '+goGame.turn);
+}
 
+// Calcule resultat du jeu, affichage du gagnant et arret du jeu
+function endGame()
+{
 
-})
+    var compteNoir      = 0,
+        compteBlanc     = 0,
+        winner;
 
+    for(x=0;x<goGame.table.length;x++){
+        for(y=0;y<goGame.table[0].length;y++){
 
+            if(goGame.table[x][y].color == 'noir')
+            {
+                compteNoir = compteNoir + 1;
+            }  
+            if(goGame.table[x][y].color == 'blanc')
+            {
+                compteBlanc = compteBlanc + 1;
+            }  
+            if(goGame.table[x][y].color == 'prisblanc')
+            {
+                compteNoir = compteNoir + 1;
+            }  
+            if(goGame.table[x][y].color == 'prisnoir')
+            {
+                compteBlanc = compteBlanc + 1;
+            }
+        }
+    }
+    
+    // Ajout des points du Komi
+    compteBlanc = compteBlanc + 7.5;
+    
+    if(compteBlanc > compteNoir)
+    {
+        winner = 'Blanc';
+    }
+    else
+    {
+        winner = 'Noir';
+    }
+    
+    $('.winner').empty();
+    $('.winner').text('Le joueur '+winner+' à gagné!');
+    $('.winner').css({'position':'absolute','margin-left':'-800px','font-size':'70px'});
+    $('.case').removeAttr('onclick');
+    
+}
 
 
 
