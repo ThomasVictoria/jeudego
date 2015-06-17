@@ -5,173 +5,114 @@ var goGame = {
     turn  : 0
 }
 
-var chainCpt = 1;
+var chainCpt        = 1,
+	compteNoir      = 0,
+	compteBlanc     = 0,
+	prisonnierNoir  = 0,
+	prisonnierBlanc = 0;
 
 // Créer le tableau qui générera le plateau
 for(x=0;x<=18;x++){
-    goGame.table[x] =[];
-    for(y=0;y<=18;y++){
-        goGame.table[x][y] = {
-            xPiece : x,
-            yPiece : y,
-            color : null,
-            chain : 0
-        }
-    }
+	goGame.table[x] =[];
+	for(y=0;y<=18;y++){
+		goGame.table[x][y] = {
+			xPiece : x+1,
+			yPiece : y+1,
+			color : null,
+			chain : 0,
+			prisoner : false
+		}
+	}
 }
 
 
 // Génére les cases du jeu de go en fonction du tableau goGame.table
 for(x=0;x<goGame.table.length;x++){
-    for(y=0;y<goGame.table[x].length;y++){
-        document.write('<span class="case" id="x' + x + 'y' + y +'" onClick="clicked('+ x +','+ y +');">.</span>');
-    }
-    document.write('<br>');
+	for(y=0;y<goGame.table[x].length;y++){
+		document.write('<span class="case" id="x' + x + 'y' + y +'" onClick="clicked('+ x +','+ y +');">.</span>');
+	}
+	document.write('<br>');
 }
 
 // Fonction principal qui change les couleurs au click 
 function clicked(x,y){
 
-    if(goGame.table[x][y].color == null){
+	if(goGame.table[x][y].color == null ){
 
-        if(goGame.table[x][y].color == null ){
+		if(checkPair(goGame.turn) == false){
 
-            if(checkPair(goGame.turn) == false){
+			goGame.table[x][y] = {
+				color : 'blanc',
+				chain : chainCpt
+			};
+			chainCpt++;
+			$('#x'+x+'y'+y).addClass('blanc');
+			$('.tour').text('Noir');
+		}
+		else{
+			goGame.table[x][y] = {
+				color : 'noir',
+				chain : chainCpt
+			};
+			chainCpt++;
+			$('#x'+x+'y'+y).addClass('noir');
+			$('.tour').text('Blanc');
 
-                goGame.table[x][y] = {
-                    color : 'noir',
-                    chain : chainCpt
-                };
-                chainCpt++;
-                $('#x'+x+'y'+y).addClass('noir');
-                $('.tour').text('Blanc');
-
-            }
-            else{
-
-                goGame.table[x][y] = {
-                    color : 'blanc',
-                    chain : chainCpt
-                };
-                chainCpt++;
-                $('#x'+x+'y'+y).addClass('blanc');
-                $('.tour').text('Noir');
-
-            }
-            goGame.turn = goGame.turn + 1;
-        }
-        else{
-            console.log('case déjà joué');
-        }    
-        retireCouleur();
-        current_state();
-    }
+		}
+		goGame.turn = goGame.turn + 1;
+		testChain(x,y);
+		current_state(x,y);
+	}
+	else{
+		console.log('case déjà joué');
+	}    
 }
 
-// Fonction qui determine la prise des cases
 function testChain(x,y){
+	var prisoners = [false, false, false, false];
+	var cpt = 0;
+	for (var i = -1; i < 2; i=i+2) {
+		if (goGame.table[x+i][y].color != null && goGame.table[x+i][y].color != goGame.table[x][y].color){
+			prisoners[cpt] = true;
+		}
+		cpt++;
+	}
+	for (var j = -1; j < 2; j= j+2) {
+		if (goGame.table[x][y+j].color != null && goGame.table[x][y+j].color != goGame.table[x][y].color){
+			prisoners[cpt] = true;
+		}
+		cpt++;
+	}
 
-    for (var i = -1; i <= 1; i+2) {
-        for (var j = -1; j <= 1; j+2) {
-            if(goGame.table[x-1][y].color != null && goGame.table[x+1][y].color != null && goGame.table[x][y-1].color != null && goGame.table[x][y+1].color != null){
-                //tester les chaines
-            }
-        }
-    }
-
-
-
-    // for(x=0;x<goGame.table.length;x++){
-    //     for(y=0;y<goGame.table[0].length;y++){
-
-    //         if(goGame.table[x][y] == 1)
-    //         {
-
-    //             if(goGame.table[x-1][y] == 2 && goGame.table[x+1][y] == 2 && goGame.table[x][y-1] == 2 && goGame.table[x][y+1] == 2)
-    //             {
-    //                 goGame.table[x][y] = 3;
-    //             }
-
-    //         }
-    //         if(goGame.table[x][y] == 2)
-    //         {
-
-    //             if(goGame.table[x-1][y] == 1 && goGame.table[x+1][y] == 1 && goGame.table[x][y-1] == 1 && goGame.table[x][y+1] == 1)
-    //             {
-    //                 goGame.table[x][y] = 4;
-    //             }
-
-    //         }
-
-    //     }
-
-    // }
+	if (prisoners[0] == true && prisoners[1] == true && prisoners[2] == true && prisoners[3] == true) {
+		goGame.table[x][y].prisoner = true;
+	}
 
 }
 
-// Fonction qui retire la couleur à la case si elle est considéré morte
-function retireCouleur(){
+function current_state(x,y){
+	var	afficheBlanc    = $('.valueBlanc'),
+		afficheNoir     = $('.valueNoir'),
+		affichePBlanc   = $('.prisonnierBlanc'),
+		affichePNoir    = $('.prisonnierNoir');
 
-    for(x=0;x<goGame.table.length;x++){
-        for(y=0;y<goGame.table[0].length;y++){
-
-            if(goGame.table[x][y] == 3)
-            {
-
-                var mort = $('span#'+x+'.case[data-info='+y+']');
-                $(mort).removeClass('blanc');
-
-            }
-            if(goGame.table[x][y] == 4)
-            {
-
-                var mort = $('span#'+x+'.case[data-info='+y+']');
-                $(mort).removeClass('noir');
-
-            }
-        }
-    }
-}
-
-// Fonction qui affiche l'état de jeu
-function current_state(){
-
-    var compteNoir      = 0,
-        compteBlanc     = 0,
-        prisonnierNoir  = 0,
-        prisonnierBlanc = 0,
-        afficheBlanc    = $('.valueBlanc'),
-        afficheNoir     = $('.valueNoir'),
-        affichePBlanc   = $('.prisonnierBlanc'),
-        affichePNoir    = $('.prisonnierNoir');
-
-    for(x=0;x<goGame.table.length;x++){
-        for(y=0;y<goGame.table[0].length;y++){
-
-            if(goGame.table[x][y].color == 'blanc')
-            {
-                compteNoir = compteNoir + 1;
-            }  
-            if(goGame.table[x][y].color == 'noir')
-            {
-                compteBlanc = compteBlanc + 1;
-            }  
-            if(goGame.table[x][y].color == 'prisnoir')
-            {
-                prisonnierNoir = prisonnierNoir + 1;
-            }  
-            if(goGame.table[x][y].color == 'prisblanc')
-            {
-                prisonnierBlanc = prisonnierBlanc + 1;
-            }
-        }
-
-        $(afficheNoir).text(compteNoir);
-        $(afficheBlanc).text(compteBlanc);
-        $(affichePBlanc).text(prisonnierNoir);
-        $(affichePNoir).text(prisonnierBlanc);
-
-    }
+	if (goGame.table[x][y].color == 'noir') {
+		if (goGame.table[x][y].prisoner == true) {
+			prisonnierBlanc++;
+		}
+		compteNoir++;
+	}
+	else if (goGame.table[x][y].color == 'blanc') {
+		if (goGame.table[x][y].prisoner == true) {
+			prisonnierNoir++;
+		}
+		compteBlanc++;
+	}
+		
+	$(afficheNoir).text(compteNoir);
+	$(afficheBlanc).text(compteBlanc);
+	$(affichePBlanc).text(prisonnierNoir);
+	$(affichePNoir).text(prisonnierBlanc);
 }
 
 // Fonction qui permet de determiner le tour du joueur
