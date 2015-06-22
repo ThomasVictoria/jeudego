@@ -9,27 +9,30 @@
 
         <img src="goban.jpg" alt="">
         <div class="compte">
-          Tour du joueur :
-           <div class="tour">Noir</div>
-            <div class="compteBlanc">
+            <div class="winner">
+                Tour du joueur :
+                <div class="tour">Noir</div>
+            </div>
+            <div class="compteNoir">
                 <div>
-                    Nombre de pièce Blanche sur le goban : <div class="valueBlanc"></div>
+                    Nombre de pièce Blanche sur le goban : <div class="valueNoir"></div>
                 </div>
                 <div>
                     Nombre de prisonniers Noir :  <div class="prisonnierNoir"></div>
                 </div>
             </div>
-            <div class="compteNoir">
+            <div class="compteBlanc">
                 <div>
-                    Nombre de pièce Noir sur le goban : <div class="valueNoir"></div>
+                    Nombre de pièce Noir sur le goban : <div class="valueBlanc"></div>
                 </div>
                 <div>
                     Nombre de prisonniers Blanc : <div class="prisonnierBlanc"></div>
                 </div>
             </div>
         </div>
-        
-        <input type="button" class="passeTour" value="Passer son tour">
+
+        <input type="button" class="passeTour" value="Passer son tour" onclick="passetour();">
+        <input type="hidden" class='compteurPasse' value=''>
 
         <script src="jquery-2.1.1.js"></script>
         <script src="script.js"></script>
