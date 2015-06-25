@@ -1,24 +1,24 @@
 span{
-    width: 40px;
-    height: 40px;
     display: inline-block;
-    color: #F3D1B6;
-    border-radius: 19px;
     z-index: 99;
     position: relative;
     color:transparent;
 }
 
 .noir{
-    background: #000;
+    background-image: url('joueur_noir.png');
+    background-size: cover;
 }
 .blanc{
-    background: #fff;
+    background-image: url('joueur_blanc.png');
+    background-size: cover;
 }
 
 img{
     position: fixed;
     z-index: 0;
+    width: auto;
+    height: 95%;
 }
 
 .passeTour{position: absolute;width: 300px;height: 100px;margin-left: 800px;margin-top: 300px;font-size:40px;}

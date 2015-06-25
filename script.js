@@ -9,30 +9,40 @@ var chainCpt        = 1,
 	compteNoir      = 0,
 	compteBlanc     = 0,
 	prisonnierNoir  = 0,
-	prisonnierBlanc = 0;
+	prisonnierBlanc = 0,
+	chains = [];
 
-// Créer le tableau qui générera le plateau
-for(x=0;x<=18;x++){
-	goGame.table[x] =[];
-	for(y=0;y<=18;y++){
-		goGame.table[x][y] = {
-			xPiece : x+1,
-			yPiece : y+1,
-			color : null,
-			chain : 0,
-			prisoner : false
+
+
+
+function initGame(){
+	// Créer le tableau qui générera le platea
+	for(x=0;x<=18;x++){
+		goGame.table[x] =[];
+		for(y=0;y<=18;y++){
+			goGame.table[x][y] = {
+				xPiece : x+1,
+				yPiece : y+1,
+				color : null,
+				chain : 0,
+				prisoner : false
+			}
 		}
 	}
-}
 
-
-// Génére les cases du jeu de go en fonction du tableau goGame.table
-for(x=0;x<goGame.table.length;x++){
-	for(y=0;y<goGame.table[x].length;y++){
-		document.write('<span class="case" id="x' + x + 'y' + y +'" onClick="clicked('+ x +','+ y +');">.</span>');
+	// Génére les cases du jeu de go en fonction du tableau goGame.table
+	var imageHeight = $('.plateau').height();
+	var imageWidth = $('.plateau').width();
+	document.write('<div class="container-pions" style="height:' + imageHeight + 'px;width:' + imageWidth + 'px;">');
+	for(x=0;x<goGame.table.length;x++){
+		for(y=0;y<goGame.table[x].length;y++){
+			document.write('<span style="height:' + 100/19 + '%;width:' + 100/19 + '%;" class="case" id="x' + x + 'y' + y +'" onClick="clicked('+ x +','+ y +');">.</span>');
+		}
+		document.write('<br>');
 	}
-	document.write('<br>');
+
 }
+
 
 // Fonction principal qui change les couleurs au click 
 function clicked(x,y){
@@ -42,19 +52,15 @@ function clicked(x,y){
 		if(checkPair(goGame.turn) == false){
 
 			goGame.table[x][y] = {
-				color : 'blanc',
-				chain : chainCpt
+				color : 'blanc'
 			};
-			chainCpt++;
 			$('#x'+x+'y'+y).addClass('blanc');
 			$('.tour').text('Noir');
 		}
 		else{
 			goGame.table[x][y] = {
-				color : 'noir',
-				chain : chainCpt
+				color : 'noir'
 			};
-			chainCpt++;
 			$('#x'+x+'y'+y).addClass('noir');
 			$('.tour').text('Blanc');
 
@@ -68,27 +74,153 @@ function clicked(x,y){
 	}    
 }
 
+
 function testChain(x,y){
+
+	var sameChainsAround = [];
+	var differentChainsAround = [];
+
+	for (var i = -1; i < 2; i=i+2) {
+		if (x == 0 && i == -1) {
+			console.log('bord haut');
+		}
+		else if (x == 18 && i == 1){
+			console.log('bord bas');
+		}
+		else if (goGame.table[x+i][y].color == goGame.table[x][y].color){
+			sameChainsAround.push(goGame.table[x+i][y].chain)
+		}
+		else if (goGame.table[x+i][y].color != goGame.table[x][y].color){
+			differentChainsAround.push(goGame.table[x+i][y].chain)
+		}
+	}
+	for (var j = -1; j < 2; j= j+2) {
+		if (y == 0 && j == -1) {
+			console.log('bord gauche');
+		}
+		else if (y == 18 && j == 1){
+			console.log('bord droit');
+		}
+		else if (goGame.table[x][y+j].color == goGame.table[x][y].color){
+			sameChainsAround.push(goGame.table[x][y+j].chain)
+		}
+		else if (goGame.table[x][y+j].color != goGame.table[x][y].color){
+			differentChainsAround.push(goGame.table[x][y+j].chain)
+		}
+	}
+
+	switch (sameChainsAround.length){
+		case 0:
+		goGame.table[x][y].chain = chainCpt;
+		chains.push([{'x' : x, 'y' : y}]);
+		chainCpt++;
+		break;
+
+		case 1:
+		goGame.table[x][y].chain = sameChainsAround[0];
+		chains[sameChainsAround[0]-1].push({'x' : x, 'y' : y});
+		break;
+
+		default:
+		var chainToMerge = Math.min.apply(Math,sameChainsAround);
+		sameChainsAround = $.grep(sameChainsAround, function(value) {
+		  return value != chainToMerge;
+		});
+
+		goGame.table[x][y].chain = chainToMerge;
+		mergeChains(sameChainsAround, chainToMerge);
+		chains[chainToMerge-1].push({'x' : x, 'y' : y});
+		sameChainsAround = [chainToMerge];
+		break;
+	}
+
+	var chainsAround = sameChainsAround.concat(differentChainsAround);
+	testChainsLiberty(chainsAround);
+
+}
+
+
+function mergeChains(array, chainToMerge){
+	for(var i=0; i<array.length; i++) {
+		for (var j = 0; j <chains[array[i]-1].length; j++) {
+			var mergingChain = chains[array[i]-1][j];
+			goGame.table[mergingChain.x][mergingChain.y].chain = chainToMerge;
+			
+		}
+	}
+}
+
+function isTrue(element, index, array) {
+  return element == true;
+}
+
+function testChainsLiberty(chainsAround){
+
+	for (var i = 0; i<chainsAround.length; i++) {
+		if (chainsAround[i] != 0) {
+			var chainEmprisoned = false;
+			var prisonersCoins = [];
+			for (var j = 0; j <chains[chainsAround[i]-1].length; j++) {
+				prisonersCoins.push(testFourLiberties(chains[chainsAround[i]-1][j].x,chains[chainsAround[i]-1][j].y));
+			}
+
+			if (prisonersCoins.every(isTrue)){
+				deleteChain(chainsAround[i]-1);
+			}
+		}
+	}
+}
+
+function testFourLiberties(x,y){
 	var prisoners = [false, false, false, false];
 	var cpt = 0;
+
 	for (var i = -1; i < 2; i=i+2) {
-		if (goGame.table[x+i][y].color != null && goGame.table[x+i][y].color != goGame.table[x][y].color){
+		if (x == 0 && i == -1) {
+			prisoners[cpt] = true;
+		}
+		else if (x == 18 && i == 1){
+			prisoners[cpt] = true;
+		}
+		else if (goGame.table[x+i][y].color == null){
+			prisoners[cpt] = false;
+		}
+		else {
 			prisoners[cpt] = true;
 		}
 		cpt++;
 	}
 	for (var j = -1; j < 2; j= j+2) {
-		if (goGame.table[x][y+j].color != null && goGame.table[x][y+j].color != goGame.table[x][y].color){
+		if (y == 0 && j == -1) {
+			prisoners[cpt] = true;
+		}
+		else if (y == 18 && j == 1){
+			prisoners[cpt] = true;
+		}
+		else if (goGame.table[x][y+j].color == null){
+			prisoners[cpt] = false;
+		}
+		else {
 			prisoners[cpt] = true;
 		}
 		cpt++;
 	}
 
 	if (prisoners[0] == true && prisoners[1] == true && prisoners[2] == true && prisoners[3] == true) {
-		goGame.table[x][y].prisoner = true;
+		return true;
 	}
-
+	else {
+		return false;
+	}
 }
+
+function deleteChain(chainNum){
+	for (i=0; i<chains[chainNum].length;i++){
+		$('#x'+chains[chainNum][i].x+'y'+chains[chainNum][i].y).attr( "class", "case" );
+	}
+}
+
+
 
 function current_state(x,y){
 	var	afficheBlanc    = $('.valueBlanc'),
@@ -204,12 +336,4 @@ function endGame()
 
 
 
-
-
-
-
-
-
-
-
-
+initGame();
