@@ -5,17 +5,24 @@ var goGame = {
     turn  : 0
 }
 
-var chainCpt        = 1,
-	compteNoir      = 0,
-	compteBlanc     = 0,
-	prisonnierNoir  = 0,
-	prisonnierBlanc = 0,
-	chains = [];
+var chainCpt          = 1,
+	compteNoir        = 0,
+	compteBlanc       = 0,
+	prisonnierNoir    = 0,
+	prisonnierBlanc   = 0,
+	timer             = -1,
+	countdownSec      = 0,
+	counter,
+	chains            = [];
 
 
 
 
-function initGame(){
+function initGame(secondsToPlay){
+
+	timer = secondsToPlay;
+	countdownSec = timer;
+
 	// Créer le tableau qui générera le platea
 	for(x=0;x<=18;x++){
 		goGame.table[x] =[];
@@ -41,7 +48,28 @@ function initGame(){
 		document.write('<br>');
 	}
 
+	counter = setInterval(countdown, 1000);
+
 }
+
+function countdown()
+{
+  countdownSec=countdownSec-1;
+  if (countdownSec <= 0)
+  {
+     passetour();
+     restartCountdown();
+     return;
+  }
+  $('.timer').html(countdownSec);
+}
+
+function restartCountdown(){
+	clearInterval(counter);
+	countdownSec = timer;
+	counter = setInterval(countdown, 1000);
+}
+
 
 
 // Fonction principal qui change les couleurs au click 
@@ -68,6 +96,7 @@ function clicked(x,y){
 		goGame.turn = goGame.turn + 1;
 		testChain(x,y);
 		current_state(x,y);
+		restartCountdown();
 	}
 	else{
 		console.log('case déjà joué');
@@ -145,7 +174,7 @@ function mergeChains(array, chainToMerge){
 		for (var j = 0; j <chains[array[i]-1].length; j++) {
 			var mergingChain = chains[array[i]-1][j];
 			goGame.table[mergingChain.x][mergingChain.y].chain = chainToMerge;
-			
+			chains[chainToMerge-1].push({'x' : mergingChain.x, 'y' : mergingChain.y});
 		}
 	}
 }
@@ -260,7 +289,7 @@ function checkPair(nombre){
 // Fonction qui determine la fin de partie
 var comptePasse = 0;
 function passetour(){
-
+	restartCountdown()
     comptePasse = comptePasse + 1;
     goGame.turn = goGame.turn + 1;
 
@@ -288,7 +317,6 @@ function passetour(){
 // Calcule resultat du jeu, affichage du gagnant et arret du jeu
 function endGame()
 {
-
     var compteNoir      = 0,
         compteBlanc     = 0,
         winner;
@@ -331,9 +359,9 @@ function endGame()
     $('.winner').text('Le joueur '+winner+' à gagné!');
     $('.winner').css({'position':'absolute','margin-left':'-800px','font-size':'70px'});
     $('.case').removeAttr('onclick');
-    
+    clearInterval(counter);
 }
 
 
 
-initGame();
+initGame(10);

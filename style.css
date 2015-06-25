@@ -14,6 +14,13 @@ span{
     background-size: cover;
 }
 
+.timer{
+    text-align: center;
+    font-size: 36px;
+    margin-top: 25px;
+}
+
+
 img{
     position: fixed;
     z-index: 0;
