@@ -54,14 +54,16 @@ function initGame(secondsToPlay){
 
 function countdown()
 {
-  countdownSec=countdownSec-1;
-  if (countdownSec <= 0)
-  {
-     passetour();
-     restartCountdown();
-     return;
-  }
-  $('.timer').html(countdownSec);
+	if (timer != -1) {
+		countdownSec=countdownSec-1;
+		if (countdownSec <= 0)
+		{
+			passetour();
+			restartCountdown();
+			return;
+		}
+		$('.timer').html(countdownSec);
+	}
 }
 
 function restartCountdown(){
@@ -96,7 +98,7 @@ function clicked(x,y){
 		goGame.turn = goGame.turn + 1;
 		testChain(x,y);
 		current_state(x,y);
-		restartCountdown();
+		if (timer != -1){restartCountdown();}
 	}
 	else{
 		console.log('case déjà joué');
@@ -289,7 +291,7 @@ function checkPair(nombre){
 // Fonction qui determine la fin de partie
 var comptePasse = 0;
 function passetour(){
-	restartCountdown()
+	if (timer != -1){restartCountdown();}
     comptePasse = comptePasse + 1;
     goGame.turn = goGame.turn + 1;
 
@@ -361,7 +363,3 @@ function endGame()
     $('.case').removeAttr('onclick');
     clearInterval(counter);
 }
-
-
-
-initGame(10);
